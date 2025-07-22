@@ -1,0 +1,30 @@
+# We recommend using GeoChange to recover the boundaries
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX ign: <http://data.ign.fr/def/geometrie#>
+
+SELECT ?name ?coordinates
+WHERE {
+  ?municipality a sett:TerritorialUnit ;
+                tsn:hasName ?name ;
+                tsn:hasIdentifier ?code ;
+                sett:country traces-geo:France ;
+                owl:sameAs ?officialOntology .
+                 
+  SERVICE <https://rdf.insee.fr/sparql> { 
+    ?officialOntology owl:sameAs ?geofla .   
+  } 
+  
+  SERVICE <http://data.ign.fr/id/sparql> {
+    ?geofla ign:geometry ?geometry .
+    ?geometry geo:asWKT ?coordinates .
+  } 
+    
+  FILTER(!STRSTARTS(STR(?geofla), "http://id.insee.fr"))
+}
+LIMIT 10
+

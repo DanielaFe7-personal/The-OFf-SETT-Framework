@@ -1,0 +1,31 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+
+SELECT DISTINCT ?name ?code (COALESCE(?coordinatesFR, ?coordinatesCH) AS ?coordinates)
+WHERE {
+  ?area sett:studyArea traces-geo:GrandGeneve ;
+        tsn:hasName ?name ;
+        tsn:hasIdentifier ?code ;
+        owl:sameAs ?boundaries .
+
+  OPTIONAL {
+    {
+      SERVICE <http://steamerlod.imag.fr/repositories/geochange?> { 
+        ?boundaries geo:hasGeometry ?geometryFR .
+        ?geometryFR geo:asWKT ?coordinatesFR .
+      }
+    }
+    UNION
+    {
+      SERVICE <https://geo.ld.admin.ch/query> { 
+        ?boundaries geo:hasGeometry ?geometryCH .
+        ?geometryCH geo:asWKT ?coordinatesCH .
+      }
+    }
+  }
+}
+

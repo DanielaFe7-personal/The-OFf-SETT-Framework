@@ -1,0 +1,38 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX idemo: <http://rdf.insee.fr/def/demo#>
+
+SELECT DISTINCT ?name ?code ?populationSwiss ?populationFrance 
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       traces-qb:dimensionArea ?area .
+
+  ?area sett:studyArea traces-geo:GrandGeneve ;
+        tsn:hasName ?name ;
+        tsn:hasIdentifier ?code ;
+        owl:sameAs ?officialOntology .
+      
+  FILTER(!STRSTARTS(STR(?officialOntology), "http://purl.org/steamer/adminexpress/"))
+
+  SERVICE <https://geo.ld.admin.ch/query> { 
+    OPTIONAL { ?officialOntology gn:population ?populationSwiss . }
+  } 
+
+  SERVICE <https://rdf.insee.fr/sparql> { 
+    OPTIONAL { 
+      ?officialOntology idemo:population ?population .
+      ?population idemo:populationTotale ?populationFrance ;
+                  idemo:date ?date .
+      FILTER (year(?date) = 2016)
+    }
+  }
+}
+ORDER BY ?name
+

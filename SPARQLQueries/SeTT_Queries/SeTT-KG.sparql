@@ -1,0 +1,1526 @@
+
+# Q0: Retrieve all named graphs
+SELECT DISTINCT ?g
+WHERE {
+  GRAPH ?g {
+    ?s ?p ?o .
+  }
+}
+
+
+
+
+# Q1: Retrieve all Thematic Trajectories linked to a specific Territorial Unit (CH2130),
+# including their thematic labels and, if available, the broader theme label from the SeTT.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?thematicTrajectory ?themeLabel ?broaderThemeLabel
+WHERE {
+    # Identify the SeTT linked to the Territorial Unit CH2130
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Get the Thematic Trajectories and their themes
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory sett:hasTheme ?theme .
+    ?theme rdfs:label ?themeLabel .
+
+    # Optionally get the broader theme associated with the SeTT
+    OPTIONAL { 
+        ?settInstance sett:hasBroaderTheme ?broaderTheme .
+        ?broaderTheme rdfs:label ?broaderThemeLabel .
+    }
+}
+
+
+# Q1.b: Retrieve all Thematic Trajectories linked to Territorial Unit CH2130
+# that have a temporal scale of 'Summer', including their thematic labels
+# and (optionally) the broader theme label from the associated SeTT.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?thematicTrajectory ?themeLabel ?broaderThemeLabel
+WHERE {
+    # Get the SeTT associated with the Territorial Unit
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Get Thematic Trajectories with a 'Summer' temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory sett:hasTheme ?theme ;
+                        sett:hasTemporalScale sett-time:Summer .
+    ?theme rdfs:label ?themeLabel .
+
+    # Optionally retrieve the broader theme label of the SeTT
+    OPTIONAL { 
+        ?settInstance sett:hasBroaderTheme ?broaderTheme .
+        ?broaderTheme rdfs:label ?broaderThemeLabel .
+    }
+}
+
+
+
+# Q2: Retrieve all intrinsic attributes associated with Episodes and/or Events
+# for the 'Temperature' thematic trajectory of Territorial Unit CH2130 during the 'Summer' temporal scale.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/> 
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT ?episode ?episodeAttr ?episodeAttrValue ?event ?eventAttr ?eventAttrValue
+WHERE {
+    # SeTT linked to the Territorial Unit CH2130
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Temperature-related Thematic Trajectories with Summer scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Intrinsic attributes of the Episode
+    ?episode sett:hasIntrinsicAttribute ?episodeAttr .
+    ?episodeAttr sett:hasAttributeValue ?episodeAttrValue .
+
+    # Optionally get intrinsic attributes of the Event
+    OPTIONAL {
+        ?event sett:hasIntrinsicAttribute ?eventAttr .
+        ?eventAttr sett:hasAttributeValue ?eventAttrValue .
+    }
+}
+
+
+
+# Q3: Retrieve all intrinsic and external attributes of Segments and Transition Points
+# for the 'Vegetation' thematic trajectory of Territorial Unit FR74308, 
+# focusing on trajectories with 'All-seasons' temporal scale.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT 
+    ?structuredTrajectory ?segment ?transitionPoint 
+    ?segmentIntrinsicAttr ?segmentIntrinsicVal 
+    ?segmentExternalAttr ?segmentExternalVal 
+    ?transitionPointIntrinsicAttr ?transitionPointIntrinsicVal 
+    ?transitionPointExternalAttr ?transitionPointExternalVal
+WHERE {
+    # Get SeTT linked to Territorial Unit FR74308
+    traces-geo:FR74308 sett:hasSeTT ?settInstance .
+
+    # Focus on Vegetation-related thematic trajectories with 'All-seasons' temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Link to segments and transition points from episodes and events
+    ?episode sett:episodeIsAnnotatedFrom ?segment .
+    ?segment sett:isSegmentOf ?structuredTrajectory .
+    
+    ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+
+    # Intrinsic and external attributes of the Segment
+    OPTIONAL {
+        ?segment sett:hasIntrinsicAttribute ?segmentIntrinsicAttr .
+        ?segmentIntrinsicAttr sett:hasAttributeValue ?segmentIntrinsicVal .
+    }
+    OPTIONAL {
+        ?segment sett:hasExternalAttribute ?segmentExternalAttr .
+        ?segmentExternalAttr sett:hasAttributeValue ?segmentExternalVal .
+    }
+
+    # Intrinsic and external attributes of the Transition Point
+    OPTIONAL {
+        ?transitionPoint sett:hasIntrinsicAttribute ?transitionPointIntrinsicAttr .
+        ?transitionPointIntrinsicAttr sett:hasAttributeValue ?transitionPointIntrinsicVal .
+    }
+    OPTIONAL {
+        ?transitionPoint sett:hasExternalAttribute ?transitionPointExternalAttr .
+        ?transitionPointExternalAttr sett:hasAttributeValue ?transitionPointExternalVal .
+    }
+}
+ORDER BY ?structuredTrajectory ?segment
+
+
+
+# Q3.a: Retrieve all intrinsic attributes of segments annotated from episodes
+# in the 'Vegetation' thematic trajectory of Territorial Unit FR74308
+# with 'All-seasons' temporal scale. Includes sequence order and attribute labels.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT 
+    ?segment ?segmentOrder 
+    ?segmentIntrinsicAttr ?intrinsicAttrLabel ?intrinsicAttrValue
+    ?event
+WHERE {
+    # Link Territorial Unit FR74308 to its SeTT
+    traces-geo:FR74001 sett:hasSeTT ?settInstance .
+
+    # Focus on Vegetation Thematic Trajectories with 'All-seasons' temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEpisode ?episode .
+
+    # Optionally retrieve an associated event
+    OPTIONAL {
+        ?thematicTrajectory sett:hasEvent ?event .
+    }
+
+    # Get segments annotated from episodes
+    ?episode sett:episodeIsAnnotatedFrom ?segment .
+    ?segment 
+        sett:isSegmentOf ?structuredTrajectory ;
+        sett:hasSequenceOrder ?segmentOrder .
+
+    # Retrieve intrinsic attributes (excluding subclasses)
+    OPTIONAL {
+        ?segment sett:hasIntrinsicAttribute ?segmentIntrinsicAttr .
+        ?segmentIntrinsicAttr 
+            rdf:type ?intrinsicAttr ;
+            sett:hasAttributeValue ?intrinsicAttrValue .
+        ?intrinsicAttr rdfs:label ?intrinsicAttrLabel .
+
+        FILTER NOT EXISTS {
+            ?subClass rdfs:subClassOf ?intrinsicAttr .
+            ?segmentIntrinsicAttr rdf:type ?subClass .
+            FILTER (?subClass != ?intrinsicAttr)
+        }
+    }
+}
+ORDER BY ?segmentOrder
+
+
+
+
+# Q3.b: Retrieve all external attributes of segments annotated from episodes
+# in the 'Vegetation' thematic trajectory of Territorial Unit FR74308,
+# focusing on 'All-seasons' temporal scale. Includes sequence order, attribute labels, and values.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT 
+    ?segment ?segmentOrder 
+    ?externalAttrLabel ?externalAttrValue
+WHERE {
+    # Get SeTT linked to Territorial Unit FR74308
+    traces-geo:FR74308 sett:hasSeTT ?settInstance .
+
+    # Focus on Vegetation-related thematic trajectories with 'All-seasons' temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Get segments annotated from episodes
+    ?episode sett:episodeIsAnnotatedFrom ?segment .
+    ?segment sett:isSegmentOf ?structuredTrajectory ;
+             sett:hasSequenceOrder ?segmentOrder .
+
+    # External attributes of the segment (excluding subclasses)
+    OPTIONAL {
+        ?segment sett:hasExternalAttribute ?externalAttr .
+        ?externalAttr 
+            sett:hasAttributeValue ?externalAttrValue ;
+            rdf:type ?externalAttrType .
+        ?externalAttrType rdfs:label ?externalAttrLabel .
+
+        FILTER NOT EXISTS {
+            ?subClass rdfs:subClassOf ?externalAttrType .
+            ?externalAttr rdf:type ?subClass .
+            FILTER(?subClass != ?externalAttrType)
+        }
+    }
+}
+ORDER BY ?segmentOrder
+
+
+
+# Q4: Retrieve the raw trajectory and the indicator it monitors
+# for the 'Temperature' thematic trajectory of Territorial Unit CH2130
+# with an 'All-seasons' temporal scale. Includes segments and annotations.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT ?rawTrajectory ?indicatorLabel
+WHERE {
+    # SeTT associated with the Territorial Unit
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Temperature-related Thematic Trajectories (All-seasons)
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Get Segments and Transition Points annotated from Episodes/Events
+    ?episode sett:episodeIsAnnotatedFrom ?segment .
+    ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+
+    # Segment is part of a Structured Trajectory and derived from a Slice
+    ?segment sett:isSegmentOf ?structuredTrajectory ;
+             sett:segmentIsDerivatedFrom ?slice .
+
+    # Slice is part of a Raw Trajectory
+    ?slice sett:isSliceOf ?rawTrajectory .
+
+    # Raw Trajectory monitors an Indicator (with label)
+    ?rawTrajectory sett:monitorsIndicator ?indicator .
+    ?indicator skos:prefLabel ?indicatorLabel .
+}
+ORDER BY ?rawTrajectory
+ 
+
+
+# Q5.a: Retrieve all top-level semantic annotations (SKOS Concepts) used in the SeTT ontology.
+# Returns only the broadest concepts (i.e., those without a broader concept above them),
+# along with optional metadata such as description and related attribute.
+
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT ?broadestAnnotationConcept ?relatedAttribute ?conceptDescription
+WHERE {
+    # Start from an existing semantic annotation
+    ?settAnnotation sett:hasSemanticAnnotation ?annotation .
+
+    # Retrieve the broadest concept in the annotation hierarchy (top-level in SKOS)
+    OPTIONAL { 
+        ?annotation skos:broader+ ?broadestAnnotationConcept .
+        FILTER NOT EXISTS { ?broadestAnnotationConcept skos:broader ?higherConcept }
+    }
+    
+    # Retrieve the attributes of the broadest annotation concept
+    OPTIONAL { 
+        ?broadestAnnotationConcept sett:hasSemanticAnnotationDescription ?conceptDescription ;
+                                   sett:semanticAnnotationBasedOnAttribute ?relatedAttribute .
+    }
+}
+ORDER BY ?broadestAnnotationConcept
+
+
+
+
+# Q5.b: Retrieve all top-level semantic annotations (SKOS Concepts) used in the SeTT ontology.
+# Returns only the broadest concepts (i.e., those without a broader concept above them),
+# along with optional metadata such as description and related attribute.
+
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?topConcept ?conceptDescription #?relatedAttribute ?annotation ?annotatedEntity
+WHERE {
+  # Territorial Unit and related SeTT
+  traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+  # Summer temperature trajectories
+  ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+  ?thematicTrajectory 
+      sett:hasTheme sett-codelist:Temperature ;
+      sett:hasTemporalScale sett-time:Summer ;
+      sett:hasEpisode ?episode ;
+      sett:hasEvent ?event .
+
+  # Get annotations on both episodes and events
+  {
+    ?episode sett:hasSemanticAnnotation ?annotation .
+    BIND(?episode AS ?annotatedEntity)
+  }
+  UNION
+  {
+    ?event sett:hasSemanticAnnotation ?annotation .
+    BIND(?event AS ?annotatedEntity)
+  }
+
+  ?annotation a skos:Concept .
+
+  # Top-level concept resolution
+  OPTIONAL {
+    ?annotation skos:broader+ ?broadest .
+    FILTER NOT EXISTS { ?broadest skos:broader ?evenHigher }
+  }
+  BIND(COALESCE(?broadest, ?annotation) AS ?topConcept)
+
+  # Metadata
+  OPTIONAL {
+    ?topConcept skos:prefLabel ?conceptDescription .
+  }
+  OPTIONAL {
+    ?topConcept sett:semanticAnnotationBasedOnAttribute ?relatedAttribute .
+  }
+}
+ORDER BY ?topConcept ?annotatedEntity
+
+
+
+
+
+
+
+# Q6: Retrieve metadata of a specific Territorial Unit (CH2130).
+# Returns all property-value pairs associated with the unit, along with human-readable property labels.
+# Excludes rdf:type to avoid returning the class type (sett:TerritorialUnit).
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT DISTINCT ?propertyLabel ?value
+WHERE {
+    # Focus on the Territorial Unit
+    traces-geo:CH2130 ?property ?value .
+
+    # Exclude rdf:type to avoid returning class declaration
+    FILTER (?property != rdf:type)
+
+    # Get human-readable label for each property
+    ?property rdfs:label ?propertyLabel .
+}
+
+
+
+# Q7: Retrieve Territorial Units in the Grand Genève study area that have
+# exactly 2 episodes in their Snow-related thematic trajectory:
+# the first annotated as SnowAccumulation, the second as SnowMelting.
+# Returns TU name and mean elevation, ordered by elevation (descending).
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?territorialUnitName ?meanElevation
+WHERE {
+    # Territorial Unit in Grand Genève with name and elevation
+    ?territorialUnit a sett:TerritorialUnit ;
+                     sett:studyArea traces-geo:GrandGeneve ;
+                     sett:meanElevationMeters ?meanElevation ;
+                     tsn:hasName ?territorialUnitName ;
+                     sett:hasSeTT ?settInstance .
+
+    # Snow-themed Thematic Trajectory with exactly 2 episodes
+    ?settInstance sett:hasThematicTrajectory ?snowTrajectory .
+    ?snowTrajectory 
+        sett:hasTheme sett-codelist:Snow ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasTotalEpisodes 2 ;
+        sett:hasEpisode ?episode1, ?episode2 .
+
+    # Episode 1: Snow Accumulation
+    ?episode1 
+        sett:hasSequenceOrder 1 ;
+        sett:hasSemanticAnnotation sett-annotations:SnowAccumulation .
+
+    # Episode 2: Snow Melting
+    ?episode2 
+        sett:hasSequenceOrder 2 ;
+        sett:hasSemanticAnnotation sett-annotations:SnowMelting .
+}
+ORDER BY DESC(?meanElevation)
+
+
+
+# Q8: Retrieve Territorial Units in the Grand Genève study area whose Temperature trajectory
+# has a decreasing last episode (i.e., the final episode is annotated under DecreaseSlope).
+# Returns TU name, trajectory, total episodes, last episode, and its order.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT 
+    ?name ?thematicTrajectory ?totalEpisodes ?lastEpisode ?lastOrder
+WHERE {
+    # Get Territorial Units in Grand Genève
+    ?territorialUnit a sett:TerritorialUnit ;
+                     sett:studyArea traces-geo:GrandGeneve ;
+                     sett:meanElevationMeters ?elevation ;
+                     tsn:hasName ?name ;
+                     sett:hasSeTT ?settInstance .
+
+    # Retrieve Temperature trajectories with episodes
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasTotalEpisodes ?totalEpisodes ;
+        sett:hasEpisode ?lastEpisode .
+
+    # Identify the last episode by matching its sequence order to total count
+    ?lastEpisode sett:hasSequenceOrder ?lastOrder .
+    FILTER (?lastOrder = ?totalEpisodes)
+
+    # The last episode must have a decreasing slope annotation
+    ?lastEpisode sett:hasSemanticAnnotation ?annotation .
+    ?annotation skos:broader sett-annotations:DecreaseSlope .
+
+    # Confirm the annotation belongs to the EpisodeSlopeAnnotation hierarchy
+    FILTER EXISTS {
+        ?annotation skos:broader+ sett-annotations:EpisodeSlopeAnnotation .
+    }
+}
+ORDER BY ?name
+
+
+
+
+# Q9: Retrieve the top 10 most frequent event dates across the Evian study area,
+# for Thematic Trajectories with the 'Vegetation' theme and 'All-seasons' temporal scale.
+# Dates are retrieved from Transition Point intrinsic attributes of type TransitionPointX.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT ?eventDate (COUNT(*) AS ?dateFrequency)
+WHERE {
+    # Territorial Units in the Evian study area
+    ?territorialUnit sett:studyArea traces-geo:Evian ;
+                     sett:hasSeTT ?settInstance .
+
+    # Filter thematic trajectories by Vegetation and All-seasons
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEvent ?event .
+
+    # Events annotated from transition points
+    ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+
+    # Get intrinsic attribute that encodes the event date
+    ?transitionPoint sett:hasIntrinsicAttribute ?intrinsicAttr .
+    ?intrinsicAttr 
+        rdf:type sett:TransitionPointX ;
+        sett:hasAttributeValue ?eventDate .
+}
+GROUP BY ?eventDate
+ORDER BY DESC(?dateFrequency)
+LIMIT 10
+
+
+
+
+# Q10: Count the number of breakpoints (Transition Points) per theme
+# across the Grand Genève study area, considering only trajectories with 'All-seasons' temporal scale.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations#>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT ?theme (COUNT(?transitionPoint) AS ?breakpointCount)
+WHERE {
+    # Territorial Units in the Grand Genève study area
+    ?territorialUnit sett:studyArea traces-geo:GrandGeneve ;
+                     sett:hasSeTT ?settInstance .
+
+    # Thematic Trajectories with All-seasons temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme ?theme ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEvent ?event .
+
+    # Events annotated from transition points
+    ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+}
+GROUP BY ?theme
+ORDER BY DESC(?breakpointCount)
+
+
+
+
+# Q11: Retrieve behavioral annotations of each episode in the Vegetation trajectory
+# of the Territorial Unit FR74308. Only annotations that belong to the
+# EpisodeBehaviorAnnotation hierarchy are returned, along with their labels.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+
+SELECT DISTINCT ?episode ?annotationLabel
+WHERE {
+    # Territorial Unit FR74308 and its SeTT
+    traces-geo:FR74308 sett:hasSeTT ?settInstance .
+
+    # Vegetation-themed Thematic Trajectory with Episodes
+    ?settInstance sett:hasThematicTrajectory ?trajectory .
+    ?trajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Behavioral annotation of the episode
+    ?episode sett:hasSemanticAnnotation ?annotation .
+    ?annotation 
+        skos:broader+ sett-annotations:EpisodeBehaviorAnnotation ;
+        skos:prefLabel ?annotationLabel .
+}
+
+
+
+# Q12: Retrieve all slices associated with raw trajectories in the CH2130 Territorial Unit,
+# focusing on Temperature-themed thematic trajectories with 'All-seasons' temporal scale.
+# Includes the monitored indicator, slice, and any attribute associated with each slice.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?rawTrajectory ?indicatorLabel ?slice ?sliceAttribute
+WHERE {
+    # Get the SeTT for Territorial Unit CH2130
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Get Temperature-related trajectories with All-seasons temporal scale
+    ?settInstance sett:hasThematicTrajectory ?trajectory .
+    ?trajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasEpisode ?episode ;
+        sett:hasEvent ?event .
+
+    # Link Episodes and Events to Segments and Transition Points
+    ?episode sett:episodeIsAnnotatedFrom ?segment .
+    ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+
+    # Segment derives from a Slice, which is part of a Raw Trajectory
+    ?segment sett:isSegmentOf ?structuredTrajectory ;
+             sett:segmentIsDerivatedFrom ?slice .
+    ?slice sett:isSliceOf ?rawTrajectory .
+
+    # Get optional attributes for the Slice
+    OPTIONAL { 
+        ?slice sett:hasAttribute ?sliceAttribute .
+    }
+
+    # Get monitored indicator and label
+    ?rawTrajectory sett:monitorsIndicator ?indicator .
+    ?indicator skos:prefLabel ?indicatorLabel .
+}
+ORDER BY ?rawTrajectory
+
+
+# Q13: Retrieve the slope annotation (as a broader concept label)
+# of the last episode in each Temperature-themed trajectory across
+# Territorial Units in the Grand Genève study area.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?territorialUnitCode ?annotationLabel
+WHERE {
+    # Territorial Units in Grand Genève
+    ?territorialUnit 
+        sett:studyArea traces-geo:GrandGeneve ;
+        tsn:hasIdentifier ?territorialUnitCode ;
+        sett:hasSeTT ?settInstance .
+
+    # Temperature trajectories with total episode count
+    ?settInstance sett:hasThematicTrajectory ?trajectory .
+    ?trajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:All-seasons ;
+        sett:hasTotalEpisodes ?totalEpisodes ;
+        sett:hasEpisode ?finalEpisode .
+
+    # Identify the last episode by its sequence order
+    ?finalEpisode sett:hasSequenceOrder ?order .
+    FILTER(?order = ?totalEpisodes)
+
+    # Retrieve the slope-related annotation and its broader label
+    ?finalEpisode sett:hasSemanticAnnotation ?annotation .
+    ?annotation skos:broader ?annotationBroader .
+    ?annotationBroader skos:prefLabel ?annotationLabel .
+
+    # Ensure the annotation belongs to the slope annotation hierarchy
+    FILTER EXISTS {
+        ?annotationBroader skos:broader sett-annotations:EpisodeSlopeAnnotation .
+    }
+}
+
+
+
+# Q14: Retrieve communes in the Grand Genève study area whose last episodes
+# in both Temperature and Urbanization trajectories (during Summer) are annotated as DecreaseSlope.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?name ?elv
+WHERE {
+    # Territorial Units in Grand Genève
+    ?territorialUnit 
+        sett:studyArea traces-geo:GrandGeneve ;
+        sett:meanElevationMeters ?elv ;
+        tsn:hasName ?name ;
+        sett:hasSeTT ?settInstance .
+
+    # --- Temperature trajectory with Summer scale ---
+    ?settInstance sett:hasThematicTrajectory ?tempTrajectory .
+    ?tempTrajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasTotalEpisodes ?totalTempEpisodes ;
+        sett:hasEpisode ?tempEpisode .
+
+    # Last episode of Temperature
+    ?tempEpisode sett:hasSequenceOrder ?tempOrder .
+    FILTER(?tempOrder = ?totalTempEpisodes)
+
+    # DecreaseSlope annotation for Temperature
+    ?tempEpisode sett:hasSemanticAnnotation ?tempAnnotation .
+    ?tempAnnotation skos:broader sett-annotations:DecreaseSlope .
+    FILTER EXISTS {
+        ?tempAnnotation skos:broader+ sett-annotations:EpisodeSlopeAnnotation .
+    }
+
+    # --- Urbanization trajectory with Summer scale ---
+    ?settInstance sett:hasThematicTrajectory ?urbTrajectory .
+    ?urbTrajectory 
+        sett:hasTheme sett-codelist:Urbanization ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasTotalEpisodes ?totalUrbEpisodes ;
+        sett:hasEpisode ?urbEpisode .
+
+    # Last episode of Urbanization
+    ?urbEpisode sett:hasSequenceOrder ?urbOrder .
+    FILTER(?urbOrder = ?totalUrbEpisodes)
+
+    # DecreaseSlope annotation for Urbanization
+    ?urbEpisode sett:hasSemanticAnnotation ?urbAnnotation .
+    ?urbAnnotation skos:broader sett-annotations:DecreaseSlope .
+    FILTER EXISTS {
+        ?urbAnnotation skos:broader+ sett-annotations:EpisodeSlopeAnnotation .
+    }
+}
+
+
+# Q15: Retrieve the number of transition points (TPs) per municipality (by code)
+# for the Vegetation theme and Summer temporal scale within the Evian study area.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT ?tunit_code (COUNT(?TP) AS ?breakpointCount)
+WHERE {
+    # Territorial Units in the Evian study area
+    ?territorialUnit 
+        sett:studyArea traces-geo:Evian ;
+        tsn:hasIdentifier ?tunit_code ;
+        sett:hasSeTT ?settInstance .
+
+    # Vegetation-themed Thematic Trajectories with Summer scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Vegetation ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasEvent ?event .
+
+    # Events associated with transition points
+    ?event sett:eventIsAnnotatedFrom ?TP .
+}
+GROUP BY ?tunit_code
+ORDER BY DESC(?breakpointCount)
+
+
+
+# Q16: Retrieve events annotated as VeryStronglyIncreaseTransition
+# within Temperature-themed Summer trajectories in the Grand Genève study area.
+# Returns the TU name, event, event date, and external attributes of the associated segment.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/> 
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+
+SELECT DISTINCT ?name ?date ?externalAttribute ?value
+WHERE {
+    # Territorial Units in Grand Genève
+    ?territorialUnit sett:studyArea traces-geo:GrandGeneve ;
+                     sett:hasSeTT ?settInstance ;
+                     tsn:hasName ?name .
+
+    # Temperature trajectory with Summer temporal scale
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasEvent ?event .
+
+    # Event annotated as VeryStronglyIncreaseTransition
+    ?event sett:hasSemanticAnnotation sett-annotations:VeryStronglyIncreaseTransition ;
+           sett:hasIntrinsicAttribute ?eventDate ;
+           sett:eventIsAnnotatedFrom ?segment .
+
+    # Get event date from intrinsic attribute
+    ?eventDate sett:hasAttributeValue ?date .
+
+    # Get external attributes of the associated segment
+    ?segment sett:hasExternalAttribute ?externalAttribute .
+    ?externalAttribute sett:hasAttributeValue ?value .
+}
+ORDER BY ?date
+
+
+
+# Q17: Query to obtain TU with more episodes
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT DISTINCT ?TU ?thematicTrajectory ?themeLabel ?broaderThemeLabel
+WHERE {
+    # Territorial Unit
+    ?TU sett:hasThematicTrajectory ?thematicTrajectory .
+
+    # Thematic Trajectory with summer temporal scale
+    ?thematicTrajectory sett:hasTheme ?theme ;
+                        sett:hasTemporalScale ?scale ;
+                        sett:hasTotalEpisodes ?episodeCount .
+    ?theme rdfs:label ?themeLabel .
+
+    FILTER(?episodeCount > 3)
+
+    # Optionally retrieve the broader theme label from the associated SeTT
+    OPTIONAL {
+        ?settInstance sett:hasThematicTrajectory ?thematicTrajectory ;
+                      sett:hasBroaderTheme ?broaderTheme .
+        ?broaderTheme rdfs:label ?broaderThemeLabel .
+    }
+}
+
+
+
+### Q18: Population trajectories queries
+
+# Query that obtaines the population count for a giving commune
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?date ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime ?date ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+  
+  FILTER (?commune = traces-geo:CH2051) 
+}
+ORDER BY ?date
+
+
+
+## Q19: Query that obtaines the population count for a giving commune, by specifict period of time
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?obs ?year ?season ?count 
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea traces-geo:FR74013 ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:dimensionTime ?time ;
+       traces-qb:measurePopulationCount ?count .
+
+   ?time time:year ?year . 
+   ?time sett-time:seasonOfYear ?season  .
+
+   FILTER(?year >= "2010"^^xsd:gYear && ?year < "2023"^^xsd:gYear)
+}
+ORDER BY ?year
+
+
+## Q20: Query that obtains the communes with a population  > 10000 in 2022
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+
+SELECT ?commune ?studyArea  ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime traces-time:20220101 ;#20221231
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+   ?commune sett:studyArea ?studyArea .
+  
+  FILTER(?population > 10000)
+}
+ORDER BY DESC(?population)
+
+
+
+## Q21: Query that obtain communes wit a decline in population for a certain years
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+SELECT DISTINCT ?commune ?year1 ?pop1 ?year2 ?pop2
+WHERE {
+  ?obs1 a qb:Observation ;
+        qb:dataSet traces-qb:Population-dataset ;
+        traces-qb:dimensionArea ?commune ;
+        traces-qb:dimensionTime ?year1 ;
+        traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+        traces-qb:measurePopulationCount ?pop1 .
+
+  ?obs2 a qb:Observation ;
+        qb:dataSet traces-qb:Population-dataset ;
+        traces-qb:dimensionArea ?commune ;
+        traces-qb:dimensionTime ?year2 ;
+        traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+        traces-qb:measurePopulationCount ?pop2 .
+
+  FILTER (str(?year2) > str(?year1))
+  FILTER (?pop2 < ?pop1)
+}
+ORDER BY ?commune ?year1
+
+
+
+## Q22: Query that calculates the population density
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?year ?population ?areaHa ?density
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime ?year ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+
+  ?commune sett:areaInHAnLake ?areaHa .
+
+  BIND((?population / (?areaHa / 100.0)) AS ?density)  # people per km²
+}
+ORDER BY ?commune ?year
+
+
+
+## Q23: Query that retreives communes where population decreased in 2020 compared with 2019
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?pop2019 ?pop2020
+WHERE {
+  # 2019 population
+  ?obs2019 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20190101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2019 .
+
+  # 2020 population
+  ?obs2020 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20200101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2020 .
+
+  # Detect decrease
+  FILTER (?pop2020 < ?pop2019)
+}
+ORDER BY DESC(?pop2019)
+
+
+## Q24: Query that retreives communes where population decreased in 2020 compared with 2019 as a big decline
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+
+SELECT ?commune ?name ?pop2019 ?pop2020 ?drop
+WHERE {
+  ?obs2019 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20190101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2019 .
+
+  ?obs2020 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20200101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2020 .
+   ?commune tsn:hasName ?name .
+
+  FILTER (?pop2020 < ?pop2019)
+  BIND(?pop2019 - ?pop2020 AS ?drop)
+  FILTER(?drop > 100)
+}
+ORDER BY DESC(?drop)
+
+
+
+## Q25: Query that calculates the population density to be stored as data frame
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+
+SELECT ?commune ?year ?population ?areaHa ?density
+WHERE {{
+        ?commune sett:studyArea traces-geo:Evian ;
+                 sett:areaInHAnLake ?areaHa .
+
+        ?obs a qb:Observation ;
+             qb:dataSet traces-qb:Population-dataset ;
+             traces-qb:dimensionArea ?commune ;
+             traces-qb:dimensionTime ?year ;
+             traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+             traces-qb:measurePopulationCount ?population .
+
+        BIND(xsd:decimal(?population) / (?areaHa / 100.0) AS ?density)
+    }}
+ORDER BY ?commune ?year
+
+
+
+## Q26: Query that obtains the communes with a population  > 10000 in 2022
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+
+SELECT ?commune ?studyArea  ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime traces-time:20220101 ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+   ?commune sett:studyArea ?studyArea .
+  
+  FILTER(?population > 10000)
+}
+ORDER BY DESC(?population)
+
+
+
+
+
+## Q27: Query that obtains population of the 20220 and 2019 drops
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+
+SELECT ?commune ?name ?pop2019 ?pop2020 ?drop
+WHERE {
+  ?obs2019 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20190101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2019 .
+
+  ?obs2020 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20200101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2020 .
+   ?commune tsn:hasName ?name .
+
+  FILTER (?pop2020 < ?pop2019)
+  BIND(?pop2019 - ?pop2020 AS ?drop)
+  FILTER(?drop > 100)
+}
+ORDER BY DESC(?drop)
+
+
+
+
+
+
+## Q28: Verification error Query to detect if a trajectory have more than one START date episode
+
+SELECT DISTINCT ?name ?elv ?popTrajectory ?popEpisode (COUNT(DISTINCT ?startDateEpisodeValue) AS ?startDateCount)
+WHERE {
+    # Territorial Units in Grand Genève
+    ?territorialUnit 
+        sett:studyArea traces-geo:GrandGeneve ;
+        sett:meanElevationMeters ?elv ;
+        tsn:hasName ?name ;
+        sett:hasSeTT ?settInstance .
+
+    # Population trajectory with All-years scale
+    ?settInstance sett:hasThematicTrajectory ?popTrajectory .
+    ?popTrajectory
+        sett:hasTheme sett-codelist:Population ;
+        sett:hasTemporalScale sett-time:All-years ;
+        sett:hasEpisode ?popEpisode .
+    
+    # Start Date Attribute
+    ?popEpisode sett:hasIntrinsicAttribute ?startDateEpisode .
+    ?startDateEpisode a sett:EpisodeStartDate ;
+                     sett:hasAttributeValue ?startDateEpisodeValue .
+}
+GROUP BY ?name ?elv ?popTrajectory ?popEpisode
+HAVING (COUNT(DISTINCT ?startDateEpisodeValue) > 1)
+
+
+
+### More queries 
+## Q29:: Retrieve all Thematic Trajectories linked to a specific Territorial Unit (CH2130),
+# including their thematic labels and, if available, the broader theme label from the SeTT.
+
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?thematicTrajectory ?themeLabel ?broaderThemeLabel
+WHERE {
+    # Identify the SeTT linked to the Territorial Unit CH2130
+    traces-geo:CH2130 sett:hasSeTT ?settInstance .
+
+    # Get the Thematic Trajectories and their themes
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+    ?thematicTrajectory sett:hasTheme ?theme .
+    ?theme rdfs:label ?themeLabel .
+
+    # Optionally get the broader theme associated with the SeTT
+    OPTIONAL { 
+        ?settInstance sett:hasBroaderTheme ?broaderTheme .
+        ?broaderTheme rdfs:label ?broaderThemeLabel .
+    }
+}
+
+
+## Q30: Query to obtain the Temperature time series of a municipality 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?time ?year ?season ?mean
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       qb:dataSet traces-qb:Seasonaly-LST-dataset ;
+       traces-qb:dimensionArea traces-geo:CH6632 ;  # Specify the value for the Area dimension
+       traces-qb:dimensionIndicator sett-codelist:st ;  # Specify the value for the Indice dimension
+       traces-qb:dimensionTime ?time ;  # Specify the value for the Time dimension
+       traces-qb:measureMeanDegCel ?mean .
+       
+   ?time time:year ?year .
+   ?time sett-time:seasonOfYear ?season .
+}
+ORDER BY ?time
+
+
+## Q31: Query to obtain TU with more episodes
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+PREFIX tsn: <http://purl.org/net/tsn#>
+SELECT DISTINCT ?name ?thematicTrajectory ?themeLabel ?broaderThemeLabel
+WHERE {
+    ?territorialUnit 
+        sett:studyArea traces-geo:GrandGeneve ;
+        sett:meanElevationMeters ?elv ;
+        tsn:hasName ?name ;
+        sett:hasSeTT ?settInstance .
+    # Territorial Unit
+    ?settInstance sett:hasThematicTrajectory ?thematicTrajectory .
+
+    # Thematic Trajectory with summer temporal scale
+    ?thematicTrajectory sett:hasTheme ?theme ;
+                        sett:hasTemporalScale ?scale ;
+                        sett:hasTotalEpisodes ?episodeCount .
+    ?theme rdfs:label ?themeLabel .
+
+    FILTER(?episodeCount > 4)
+
+    # Optionally retrieve the broader theme label from the associated SeTT
+    OPTIONAL {
+        ?settInstance sett:hasThematicTrajectory ?thematicTrajectory ;
+                      sett:hasBroaderTheme ?broaderTheme .
+        ?broaderTheme rdfs:label ?broaderThemeLabel .
+    }
+}
+
+
+
+## Q32: Query that obtain Events annotaded as Strong
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+SELECT DISTINCT ?tunit_code ?name ?trajectory ?TPmagVal
+WHERE {
+    # Territorial Units in Grand Genève
+    ?territorialUnit 
+        sett:studyArea traces-geo:GrandGeneve ;
+        tsn:hasIdentifier ?tunit_code ;
+        tsn:hasName ?name ;
+        sett:hasSeTT ?settInstance .
+
+    # Temperature trajectories with total episode count
+    ?settInstance sett:hasThematicTrajectory ?trajectory .
+    ?trajectory 
+        sett:hasTheme sett-codelist:Temperature ;
+        sett:hasTemporalScale sett-time:Summer ;
+        sett:hasEvent ?event .
+
+
+    # Retrieve the slope-related annotation and its broader label
+    ?event sett:hasSemanticAnnotation sett-annotations:StronglyIncreaseTransition .
+    
+    ?event sett:eventIsAnnotatedFrom ?TP .
+    ?TP sett:hasExternalAttribute ?TPmag .
+    ?TPmag rdf:type sett:TransitionPointMagnitude;
+           sett:hasAttributeValue ?TPmagVal .
+   
+}
+ORDER BY DESC(?TPmagVal)
+
+
+## Q33: Query that obtains the Unit of the CLC dataset
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT *
+WHERE {
+  ?observation a qb:Observation ;
+               qb:dataSet traces-qb:CLC-dataset ;
+               traces-qb:dimensionArea traces-geo:CH6621 ;
+               traces-qb:dimensionIndicator ?i ;
+               sdmx-attribute:unitMeasure ?unit ;
+               traces-qb:dimensionTime ?time ;
+               traces-qb:measureLandCover ?m .
+  ?time time:year ?date .
+  ?i skos:notation ?indexNotation .
+  BIND (substr(?indexNotation, 1, 4) AS ?index)
+  BIND (STRAFTER(str(?unit), "unit/") AS ?unitNotation)
+}
+ORDER BY ?date
+
+
+# Summary queries
+
+## Q34:Query to obtain the percentage of Episodes annotated as Increase or Decrease (All episodes are taken into account)
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+
+SELECT ?trendLabel (COUNT(DISTINCT ?episode) AS ?count) 
+       ((COUNT(DISTINCT ?episode) * 100.0) / ?totalEpisodesCount AS ?percentage)
+WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?e) AS ?totalEpisodesCount)
+    WHERE {
+      ?tu sett:studyArea traces-geo:GrandGeneve ;
+          sett:hasSeTT ?s .
+      ?s sett:hasThematicTrajectory ?t .
+      ?t sett:hasTheme sett-codelist:Snow ; # Change twice
+         sett:hasTemporalScale sett-time:Summer ;# Change twice
+         sett:hasEpisode ?e .
+      
+      ?e sett:hasSemanticAnnotation ?a .
+      ?a skos:broader+ ?trendConcept .
+      VALUES ?trendConcept {
+        sett-annotations:IncreaseSlope
+        sett-annotations:DecreaseSlope
+      }
+    }
+  }
+
+  ?territorialUnit
+    sett:studyArea traces-geo:GrandGeneve ;
+    sett:hasSeTT ?settInstance .
+
+  ?settInstance sett:hasThematicTrajectory ?trajectory .
+  ?trajectory
+    sett:hasTheme sett-codelist:Snow ; # Change twice
+    sett:hasTemporalScale sett-time:Summer ; # Change twice
+    sett:hasEpisode ?episode .
+
+  ?episode sett:hasSemanticAnnotation ?trendAnn .
+  ?trendAnn skos:broader+ ?trendConcept .
+  VALUES ?trendConcept {
+    sett-annotations:IncreaseSlope
+    sett-annotations:DecreaseSlope
+  }
+  ?trendConcept skos:prefLabel ?trendLabel .
+}
+GROUP BY ?trendLabel ?totalEpisodesCount
+ORDER BY DESC(?percentage)
+
+
+
+
+## Q35: Query to obtain the percentage of Episodes annotated as Increase or Decrease && Duration classification(All episodes are taken into account)
+# Focus in  only the LAST EPSIDES
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sett-annotations: <http://purl.org/net/sett/annotations/>
+
+SELECT ?trendLabel ?durationLabel (COUNT(DISTINCT ?episode) AS ?count)
+WHERE {
+  ?territorialUnit
+    sett:studyArea traces-geo:GrandGeneve ;
+    tsn:hasIdentifier ?territorialUnitCode ;
+    sett:hasSeTT ?settInstance .
+
+  ?settInstance sett:hasThematicTrajectory ?trajectory .
+  ?trajectory
+    sett:hasTheme sett-codelist:Temperature ;
+    sett:hasTemporalScale sett-time:Summer ;
+    sett:hasTotalEpisodes ?totalEpisodes ;
+    sett:hasEpisode ?episode .
+
+ 
+  ?episode sett:hasSemanticAnnotation ?trendAnn .
+  ?trendAnn skos:broader+ ?trendConcept .
+  VALUES ?trendConcept { sett-annotations:IncreaseSlope sett-annotations:DecreaseSlope }
+  ?trendConcept skos:prefLabel ?trendLabel .
+
+  ?episode sett:hasSemanticAnnotation ?durationAnn .
+  VALUES ?durationAnn {
+    sett-annotations:ShortTermDuration
+    sett-annotations:ModerateTermDuration
+    sett-annotations:LongTermDuration
+  }
+  ?durationAnn skos:prefLabel ?durationLabel .
+}
+GROUP BY ?trendLabel ?durationLabel
+ORDER BY ?trendLabel ?durationLabel
+
+
+
+## Q36: Query to Obtain the top Event dates per Study area
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+SELECT ?eventDate (COUNT(*) AS ?frequency)
+WHERE {
+  ?territorialUnit sett:hasSeTT ?settInstance ;
+                   sett:studyArea traces-geo:GrandGeneve .
+  ?settInstance sett:hasThematicTrajectory ?trajectory .
+  ?trajectory sett:hasEvent ?event ;
+              sett:hasTheme sett-codelist:Temperature ;
+              sett:hasTemporalScale sett-time:Summer.
+
+  ?event sett:eventIsAnnotatedFrom ?transitionPoint .
+  ?transitionPoint sett:hasIntrinsicAttribute ?intrinsicAttribute .
+  ?intrinsicAttribute rdf:type sett:TransitionPointX ;
+                      sett:hasAttributeValue ?eventDate .
+}
+GROUP BY ?eventDate
+ORDER BY DESC(?frequency)
+LIMIT 3
+
+
+## Q37: Query to Obtain the count of Events per municipality 
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+
+SELECT ?territorialUnitCode (COUNT(DISTINCT ?event) AS ?eventCount)
+WHERE {
+  ?territorialUnit sett:studyArea traces-geo:GrandGeneve ;
+                   tsn:hasIdentifier ?territorialUnitCode ;
+                   sett:hasSeTT ?settInstance .
+
+  ?settInstance sett:hasThematicTrajectory ?trajectory .
+  ?trajectory sett:hasTheme sett-codelist:Population ;
+              sett:hasEvent ?event .
+}
+GROUP BY ?territorialUnitCode
+ORDER BY DESC(?eventCount)
+
+
+
+## Q38: Identify Population last event as Decreasing 
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX : <http://purl.org/net/sett/vocab#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?name  ?event ?annotationLabel 
+WHERE {
+  ?territorialUnit sett:hasSeTT ?settInstance ;
+                   sett:studyArea traces-geo:GrandGeneve ;
+                   tsn:hasIdentifier ?code ;
+                   tsn:hasName ?name .
+                    
+  ?settInstance sett:hasThematicTrajectory ?trajectory .
+  ?trajectory sett:hasEvent ?event ;
+              sett:hasTotalEvents ?totalEvents ;
+              sett:hasTheme sett-codelist:Population ;
+              sett:hasTemporalScale sett-time:All-years.
+
+  # Retrieve the slope-related annotation and its broader label
+    ?event sett:hasSemanticAnnotation ?annotation ;
+                sett:hasSequenceOrder ?lastOrder .
+    FILTER (?lastOrder = ?totalEvents)
+    
+    ?annotation skos:broader ?annotationBroader .
+    ?annotationBroader skos:prefLabel ?annotationLabel .
+    FILTER (?annotationLabel = "Decrease Transition")
+
+}
+
+
+
+

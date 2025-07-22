@@ -1,0 +1,21 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX idemo: <http://rdf.insee.fr/def/demo#>
+
+SELECT ?popTotale ?date
+WHERE {
+  ?municipality a sett:TerritorialUnit ;
+                tsn:hasName "Abondance" ;
+                sett:country traces-geo:France ;
+                owl:sameAs ?officialOntology .
+  
+  SERVICE <https://rdf.insee.fr/sparql> { 
+    ?officialOntology idemo:population ?population .
+    ?population idemo:populationTotale ?popTotale ;
+                idemo:date ?date .
+  }
+}
+

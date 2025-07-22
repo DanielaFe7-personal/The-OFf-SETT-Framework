@@ -1,0 +1,19 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?broaderIndexConcept (AVG(?dataQuality) AS ?avgDataQuality) 
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       qb:dataSet traces-qb:Seasonaly-LIS-dataset ;
+       traces-qb:dimensionArea ?area ;
+       traces-qb:dimensionTime ?time ;
+       traces-qb:dimensionIndicator ?index ;
+       traces-qb:measureDataQualityPct ?dataQuality .
+
+  ?index skos:broader ?broaderIndexConcept .
+}
+GROUP BY ?broaderIndexConcept
+
+

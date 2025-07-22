@@ -1,0 +1,12 @@
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT DISTINCT ?attribute ?componentLevel
+WHERE {
+    ?measure a qb:MeasureProperty .
+    ?level sdmx-attribute:unitMeasure ?attribute .
+    ?level rdf:type ?componentLevel .
+    
+    FILTER (?componentLevel != rdf:Property)
+}

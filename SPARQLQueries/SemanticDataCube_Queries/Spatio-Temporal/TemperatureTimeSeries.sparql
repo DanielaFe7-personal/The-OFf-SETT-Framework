@@ -1,0 +1,24 @@
+# Query to obtain the Temperature time series of a municipality 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett-time: <http://purl.org/net/sett/time#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?obs ?time ?year ?season 
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       qb:dataSet traces-qb:Seasonaly-LST-dataset ;
+       traces-qb:dimensionArea traces-geo:CH6632 ;  # Specify the value for the Area dimension
+       traces-qb:dimensionIndicator sett-codelist:st ;  # Specify the value for the Indice dimension
+       traces-qb:dimensionTime ?time .  # Specify the value for the Time dimension
+       
+   ?time time:year ?year .
+   ?time sett-time:seasonOfYear ?season .
+}
+ORDER BY ?time
+
+

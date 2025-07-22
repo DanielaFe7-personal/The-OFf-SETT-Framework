@@ -1,0 +1,12 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?property ?metadata
+WHERE {
+    ?indicator a skos:Concept ;
+             ?property ?metadata .
+    
+    FILTER (?indicator = sett-codelist:NDVI) 
+}

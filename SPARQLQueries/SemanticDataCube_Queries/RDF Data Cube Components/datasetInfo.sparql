@@ -1,0 +1,12 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+
+SELECT ?property ?metadata
+WHERE {
+    ?dataSet a qb:DataSet ;
+             ?property ?metadata .
+    
+    FILTER (?dataSet = traces-qb:CLC-dataset) # Replace CLC by Seasonaly-LIS or Seasonaly-LST
+}
+

@@ -1,0 +1,140 @@
+# Query that obtaines the population in 2006 count for a giving study area
+# Query that obtaines the population in 2006 count for a giving study area
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX tsn: <http://purl.org/net/tsn#>
+
+SELECT ?name ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime ?date ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+  ?commune sett:studyArea traces-geo:GrandGeneve ;
+           tsn:hasName ?name .
+
+  FILTER (?date = traces-time:20210101) 
+}
+ORDER BY DESC (?population)
+
+
+
+
+
+# Query that obtaines the population count for a giving commune
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?date ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime ?date ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+  
+  FILTER (?commune = traces-geo:CH2051) 
+}
+ORDER BY ?date
+
+
+
+
+# Query that obtains the communes with a population  > 10000 in 2022
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+
+SELECT ?commune ?studyArea  ?population
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime traces-time:20220101 ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+   ?commune sett:studyArea ?studyArea .
+  
+  FILTER(?population > 10000)
+}
+ORDER BY DESC(?population)
+
+
+
+# Query that retreives communes where population decreased in 2020 compared with 2019
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-time: <http://purl.org/net/traces/dataset/time/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?pop2019 ?pop2020
+WHERE {
+  # 2019 population
+  ?obs2019 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20190101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2019 .
+
+  # 2020 population
+  ?obs2020 a qb:Observation ;
+           qb:dataSet traces-qb:Population-dataset ;
+           traces-qb:dimensionArea ?commune ;
+           traces-qb:dimensionTime traces-time:20200101 ;
+           traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+           traces-qb:measurePopulationCount ?pop2020 .
+
+  # Detect decrease
+  FILTER (?pop2020 < ?pop2019)
+}
+ORDER BY DESC(?pop2019)
+
+# Query that calculates the population density 
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+
+SELECT ?commune ?year ?population ?areaHa ?density
+WHERE {
+  ?obs a qb:Observation ;
+       qb:dataSet traces-qb:Population-dataset ;
+       traces-qb:dimensionArea ?commune ;
+       traces-qb:dimensionTime ?year ;
+       traces-qb:dimensionIndicator sett-codelist:MunicipalPopulation ;
+       traces-qb:measurePopulationCount ?population .
+
+  ?commune sett:areaInHAnLake ?areaHa . #Area no lake
+
+  BIND((?population / (?areaHa / 100.0)) AS ?density)  # people per km²
+}
+ORDER BY ?commune ?year
+
+
+# Query that retreive a commune name
+PREFIX tsn: <http://purl.org/net/tsn#>
+PREFIX sett: <http://purl.org/net/sett/vocab#>
+
+SELECT ?commune ?studyArea
+WHERE {
+  ?commune tsn:hasName "Genève (Ville)" ;
+           sett:studyArea ?studyArea .
+
+}
+
+
+

@@ -1,0 +1,24 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX traces-qb: <http://purl.org/net/traces/dataset/qb/>
+PREFIX traces-geo: <http://purl.org/net/traces/dataset/geo/>
+PREFIX sett-codelist: <http://purl.org/net/sett/codelist/>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?time (AVG(?dataQuality) AS ?avgDataQuality)
+WHERE {
+  ?obs rdf:type qb:Observation ;
+       qb:dataSet traces-qb:Seasonaly-LIS-dataset ;  
+       traces-qb:dimensionArea traces-geo:FR74013 ;
+       traces-qb:dimensionIndicator sett-codelist:NDGlaI ;
+       traces-qb:dimensionTime ?time ;
+       traces-qb:measureDataQualityPct ?dataQuality .
+
+  ?time time:month ?month .
+    
+  FILTER(?month >= "--03"^^xsd:gMonth && ?month < "--10"^^xsd:gMonth)
+}
+GROUP BY ?time
+
+
