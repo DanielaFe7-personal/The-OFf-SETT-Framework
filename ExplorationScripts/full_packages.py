@@ -33,6 +33,11 @@ import os
 import pickle
 from pathlib import Path
 
+from SPARQLWrapper import SPARQLWrapper, JSON
+import plotly.io as pio
+from dateutil.parser import parse
+
+
 
 import warnings
 warnings.filterwarnings('ignore')

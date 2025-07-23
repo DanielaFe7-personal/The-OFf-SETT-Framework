@@ -223,6 +223,6 @@ df_name_Fr_clc.head()
 
 
 "Path to the bounderies Case studies frames"
-GG_path = "Bouderies_map/COMMUNES_GrandGeneve_4326.gpkg"
-Fb_path = "Bouderies_map/COMMUNES_Fribourg_4326.gpkg"
-Ev_path = "Bouderies_map/COMMUNES_Evian_4326.gpkg"
+GG_path = "Study_Areas_Boundaries_map/COMMUNES_GrandGeneve_4326.gpkg"
+Fb_path = "Study_Areas_Boundaries_map/COMMUNES_Fribourg_4326.gpkg"
+Ev_path = "Study_Areas_Boundaries_map/COMMUNES_Evian_4326.gpkg"
