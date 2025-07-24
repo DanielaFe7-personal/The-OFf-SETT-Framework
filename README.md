@@ -1,20 +1,23 @@
-# The-OFf-SETT-Framework
-The OFf-SETT Framework
+# The-OFf-SETT Framework Toolkit
+The OFf-SETT Framework Toolkit
 
 ## Overview
 
-**The OFf‑SETT Framework** is a Jupyter‑Notebook‑based tool for exploring and querying **SeTT**, a multi‑layer ontology of semantic trajectories for Territorial Units. It integrates:
+The **OFf‑SETT Framework Toolkit** is a suite of resources for exploring and querying **SeTT** — a multi-layered ontology designed to represent semantic trajectories of Territorial Units within the Linked Open Data (LOD) cloud. It includes:
 
-- **Exploration scripts** for inspecting ontology structure  
-- **SPARQL queries** to extract semantic and trajectory insights  
-- Reference to ontology definitions in `TheSeTTOntology/`
+- **Exploration scripts** for analyzing the SeTT Knowledge Graph (SeTT-KG), populated with:
+  - **Spectral indices data** (e.g., NDVI, Surface Temperature, NDWI, NDSI, NDBI)
+  - **Demographic data** (e.g., municipal population)
+- **SPARQL queries** to explore semantic trajectories and semantic data cubes
+- References to ontology definitions provided in the `TheSeTTOntology/` directory
+
 
 ---
 
 ## Repository Structure
 
-    ├── ExplorationScripts/     # Notebooks for interactive analysis
-    ├── SPARQLQueries/         # Pre‑configured SPARQL query files
+    ├── ExplorationScripts/     # Dataset and Notebooks for interactive analysis
+    ├── SPARQLQueries/         # Pre‑defined SPARQL query files for exploration
     ├── TheSeTTOntology/       # Underlying ontology files (.ttl, .owl)
     ├── .gitignore
     └── README.md
@@ -29,71 +32,26 @@ The OFf-SETT Framework
 - Jupyter Notebook or JupyterLab  
 - RDF/SPARQL libraries:
 
-    pip install rdflib SPARQLWrapper
+### How It Works
 
-### Installation
+- **SeTT Ontology** models raw, structured, and semantic trajectories that describe the evolution of Territorial Units across various themes such as vegetation, temperature, and population.
 
-1. Clone the repository:
+ExplorationScripts provide Jupyter notebooks for querying and visualizing the SeTT-KG. The data focuses on the study areas of Evian, Fribourg, and Grand Genève, located in France and Switzerland.
+- **ExplorationScripts** include Python notebooks for querying and visualizing the SeTT-KG populated with study area data, namely Evian, Fribourg, and Grand Geneve; located at France and Switzerland.
+- **SPARQLQueries** folder includes a set of pre-written SPARQL queries to extract structured knowledge and recurring patterns from the knowledge graph.
 
-    git clone https://github.com/DanielaFe7-personal/The-OFf-SETT-Framework.git
-    cd The-OFf-SETT-Framework
+##  More information on SeTT ontology and SeTT-KG
 
-2. (Optional) Create and activate a virtual environment:
+### SeTT ontology documentation webpage
+    [http://steamerlod.imag.fr/
+    Select the TRACES_KG_TRAJECTORIES repository](https://danielafe7-personal.github.io/TheSeTTOntology/)
 
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+### SPARQL endpoint URL
+ http://steamerlod.imag.fr/
+ Select the TRACES_KG_TRAJECTORIES repository
 
----
-
-## Usage Examples
-
-### 1. Run Exploration Notebooks
-
-Open Jupyter and navigate to the `ExplorationScripts/` directory to interactively load and explore the ontology.
-
-### 2. Execute SPARQL Queries
-
-Run `.rq` files from `SPARQLQueries/` against a local or remote SPARQL endpoint, such as Apache Jena Fuseki:
-
-    curl -X POST -H "Content-Type: application/sparql-query" \
-         --data-binary @query.rq \
-         http://localhost:3030/SeTT/sparql
-
-Alternatively, use Python scripts with `SPARQLWrapper`.
-
----
-
-## How It Works
-
-- **SeTT Ontology** defines raw, structured, and semantic trajectories for Territorial Units.
-- **ExplorationScripts** include Python notebooks for querying, browsing, and visualizing ontology content.
-- **SPARQLQueries** folder includes pre-defined queries for extracting structured knowledge and patterns.
-
----
-
-## 🛠️ Extending the Framework
-
-- Add new SPARQL `.rq` files tailored to your domain.
-- Enrich notebooks with visualizations (`graphviz`, `networkx`, etc.).
-- Connect to external datasets or inference engines.
-
----
-
-## References & Credits
-
-- TheSeTTOntology Repository: https://github.com/DanielaFe7-personal/TheSeTTOntology-Repository  
-- Developed by **Daniela Fe**
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** – see the LICENSE file for details.
-
----
 
 ## Contact
 
-Questions or feedback? Open an issue on GitHub or reach out to **@DanielaFe7-personal**.
+Questions or feedback? Open an issue on GitHub or reach out to **daniela.milon-flores@univ-grenoble-alpes.fr ; dmilonflores@gmail.com ; camille.bernard@univ-grenoble-alpes.fr ; jerome.gensel@univ-grenoble-alpes.fr ; gregory.giuliani@unige.ch**.
 
-> “The OFf‑SETT Framework” enables reproducible semantic‑trajectory exploration using interactive tools and SPARQL automation. Dive in!
