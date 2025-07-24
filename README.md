@@ -53,5 +53,13 @@ ExplorationScripts provide Jupyter notebooks for querying and visualizing the Se
 
 ## Contact
 
-Questions or feedback? Open an issue on GitHub or reach out to **daniela.milon-flores@univ-grenoble-alpes.fr ; dmilonflores@gmail.com ; camille.bernard@univ-grenoble-alpes.fr ; jerome.gensel@univ-grenoble-alpes.fr ; gregory.giuliani@unige.ch**.
+Questions or feedback? Open an issue on GitHub or reach out to:
+- Daniela Milon-Flores : daniela.milon-flores@univ-grenoble-alpes.fr, dmilonflores@gmail.com
+
+- Camille Bernard : camille.bernard@univ-grenoble-alpes.fr
+
+- Jérôme Gensel : jerome.gensel@univ-grenoble-alpes.fr
+
+- Gregory Giuliani : gregory.giuliani@unige.ch
+
 
