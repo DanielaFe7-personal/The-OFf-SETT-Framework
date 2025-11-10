@@ -1,7 +1,7 @@
 ### SPARQL endpoint URL
  http://steamerlod.imag.fr/
  Select the TracesSemanticTrajectories repository as illustrated in Figure endpoint
- ![screenshot](endpoint.png.png)
+ ![screenshot](endpoint.png)
 
 
 
