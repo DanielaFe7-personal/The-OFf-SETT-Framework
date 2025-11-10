@@ -16,11 +16,19 @@ The **OFf‑SETT Framework Toolkit** is a suite of resources for exploring and q
 
 ## Repository Structure
 
-    ├── ExplorationScripts/     # Dataset and Notebooks for interactive analysis
-    ├── SPARQLQueries/         # Pre‑defined SPARQL query files for exploration
-    ├── TheSeTTOntology/       # Underlying ontology files (.ttl, .owl)
+Toolkit
+    ├── ExplorationScripts/ # Datasets and notebooks for interactive analysis
+    ├── SPARQLQueries/ # Predefined SPARQL query files for exploration
+    ├── TheSeTTOntology/ # Underlying ontology files (.ttl, .owl)
     ├── .gitignore
     └── README.md
+
+SeTT_CommonInputData
+
+    ├── Spectral_Indices_Dataset/ # Spectral indices per Study Area (Evian, Fribourg, Grand Geneve)
+        ├── Three families: LIS, LST, and CLC
+    ├── 2_SeTT_Segment_Identification/ # Transition point & segment detection (BEAST algorithm)  
+    ├── StudyAreas_Boundaries_Map/ # GeoPackage (.gpkg) boundaries for mapping
 
 ---
 
@@ -44,11 +52,11 @@ ExplorationScripts provide Jupyter notebooks for querying and visualizing the Se
 
 ### SeTT ontology documentation webpage
     [http://steamerlod.imag.fr/
-    Select the TRACES_KG_TRAJECTORIES repository](https://danielafe7-personal.github.io/TheSeTTOntology/)
+    Select the TracesSemanticTrajectories repository](https://danielafe7-personal.github.io/TheSeTTOntology/)
 
 ### SPARQL endpoint URL
  http://steamerlod.imag.fr/
- Select the TRACES_KG_TRAJECTORIES repository
+ Select the TracesSemanticTrajectories repository
 
 
 ## Contact

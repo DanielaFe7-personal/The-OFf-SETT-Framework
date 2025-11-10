@@ -1,0 +1,76 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# Pyre type checker
+.pyre/
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+
+# MyPy
+.mypy_cache/
+
+# PyCharm project files
+.idea/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VS Code (in case you use it alongside)
+.vscode/
+
+# Logs and local dev files
+*.log
+*.pot
+*.mo
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Wheels
+*.whl
+
+# Python egg metadata
+*.egg
+
+# Installer logs
+pip-log.txt
+
+# Test output
+test-results/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
