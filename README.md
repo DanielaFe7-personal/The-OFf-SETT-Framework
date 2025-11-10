@@ -17,6 +17,7 @@ The **OFf‑SETT Framework Toolkit** is a suite of resources for exploring and q
 ## Repository Structure
 
 Toolkit
+
     ├── ExplorationScripts/ # Datasets and notebooks for interactive analysis
     ├── SPARQLQueries/ # Predefined SPARQL query files for exploration
     ├── TheSeTTOntology/ # Underlying ontology files (.ttl, .owl)
